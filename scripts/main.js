@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import Stats from 'three/examples/jsm/libs/stats.module'
 import { Player } from './player';
 
 const scene = new THREE.Scene();
@@ -41,9 +42,25 @@ loader.load(
 const player = new Player(scene);
 
 // Lighting
-const directionalLight1 = new THREE.DirectionalLight(0xffffff, 1);
-directionalLight1.position.set(5, 10, 7.5);
-scene.add(directionalLight1);
+const directionalLight = new THREE.DirectionalLight( 0xffffff, 2.5 );
+directionalLight.position.set( - 5, 25, - 1 );
+directionalLight.castShadow = true;
+directionalLight.shadow.camera.near = 0.01;
+directionalLight.shadow.camera.far = 500;
+directionalLight.shadow.camera.right = 30;
+directionalLight.shadow.camera.left = - 30;
+directionalLight.shadow.camera.top	= 30;
+directionalLight.shadow.camera.bottom = - 30;
+directionalLight.shadow.mapSize.width = 1024;
+directionalLight.shadow.mapSize.height = 1024;
+directionalLight.shadow.radius = 4;
+directionalLight.shadow.bias = - 0.00006;
+scene.add(directionalLight);
+
+
+// const directionalLight1 = new THREE.DirectionalLight(0xffffff, 1);
+// directionalLight1.position.set(5, 10, 7.5);
+// scene.add(directionalLight1);
 
 const directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.5);
 directionalLight2.position.set(-5, -10, -7.5);
@@ -56,6 +73,9 @@ scene.add(pointLight);
 const ambientLight = new THREE.AmbientLight(0x404040); // soft white light
 scene.add(ambientLight);
 
+const stats = new Stats()
+document.body.appendChild(stats.dom)
+
 let previousTime = performance.now();
 function animate() {
     let currentTime = performance.now();
@@ -65,6 +85,8 @@ function animate() {
     controls.update();
     player.applyInputs(dt);
     renderer.render(scene, player.controls.isLocked ? player.camera : orbitCamera);
+
+    stats.update()
 
     previousTime = currentTime;
 }

@@ -73,7 +73,9 @@ export class Player {
             break;
           case 'KeyR':
             if (this.repeat) break;
+            this.position.x = 1;
             this.position.y = 1;
+            this.position.z = 1;
             this.velocity.set(0, 0, 0);
             break;
         }
@@ -101,7 +103,7 @@ export class Player {
     }
     
     /**
-    * Returns player position in a readable string form
+    * Returns player position 
     * @returns {string}
     */
     toString() {
