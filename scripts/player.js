@@ -1,111 +1,138 @@
 import * as THREE from 'three';
+import { Octree } from 'three/addons/math/Octree.js';
+import { Capsule } from 'three/addons/math/Capsule.js';
 import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
 
 export class Player {
     height = 1.75;
     radius = 0.5;
     maxSpeed = 5;
-  
     jumpSpeed = 10;
-    sprinting = false;
+    gravity = -9.8;
     onGround = false;
-  
     input = new THREE.Vector3();
     velocity = new THREE.Vector3();
-
     camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 200);
     controls = new PointerLockControls(this.camera, document.body);
-    
-    /**
-     * @param {THREE.Scene} scene
-     */
+
+    octree = new Octree();
+    playerCollider = new Capsule(
+        new THREE.Vector3(0, this.height / 2, 0),
+        new THREE.Vector3(0, -this.height / 2, 0),
+        this.radius
+    );
+
     constructor(scene) {
         this.position.set(0, 1, 0);
         scene.add(this.camera);
 
         document.addEventListener('keyup', this.onKeyUp.bind(this));
         document.addEventListener('keydown', this.onKeyDown.bind(this));
-        // document.addEventListener('mousedown', this.onMouseDown.bind(this));
     }
 
-    /**
-    * @param {THREE.Vector3}
-    */
     get position() {
         return this.camera.position;
     }
 
     applyInputs(dt) {
-        // console.log(dt);
         if (this.controls.isLocked === true) {
+            // Apply gravity
+            if (!this.onGround) {
+                this.velocity.y += this.gravity * dt;
+            } else {
+                this.velocity.y = 0;
+            }
+
             this.velocity.x = this.input.x;
             this.velocity.z = this.input.z;
+
             this.controls.moveRight(this.velocity.x * dt);
             this.controls.moveForward(this.velocity.z * dt);
             this.position.y += this.velocity.y * dt;
 
+            // Update player collider position
+            this.playerCollider.start.set(this.position.x, this.position.y + this.height / 2, this.position.z);
+            this.playerCollider.end.set(this.position.x, this.position.y - this.height / 2, this.position.z);
+
+            this.checkCollisions();
+
+            // Prevent the player from falling through the ground
             if (this.position.y < 0) {
-            this.position.y = 0;
-            this.velocity.y = 0;
+                this.position.y = 0;
+                this.velocity.y = 0;
+                this.onGround = true;
             }
         }
 
         document.getElementById('player-position').innerHTML = this.toString();
     }
 
+    checkCollisions() {
+        const result = this.octree.capsuleIntersect(this.playerCollider);
+        if (result) {
+            const collisionNormal = result.normal;
+            const depth = result.depth;
+
+            // Adjust the position and velocity of the player based on the collision
+            this.position.add(collisionNormal.multiplyScalar(depth));
+            this.velocity.addScaledVector(collisionNormal, -this.velocity.dot(collisionNormal));
+
+            // If the collision normal is pointing upwards, the player is on the ground
+            if (collisionNormal.y > 0.5) {
+                this.onGround = true;
+            } else {
+                this.onGround = false;
+            }
+        }
+    }
+
     onKeyDown(event) {
         if (!this.controls.isLocked) {
             this.controls.lock();
         }
-    
+
         switch (event.code) {
-          case 'KeyW':
-            this.input.z = this.maxSpeed;
-            break;
-          case 'KeyA':
-            this.input.x = -this.maxSpeed;
-            break;
-          case 'KeyS':
-            this.input.z = -this.maxSpeed;
-            break;
-          case 'KeyD':
-            this.input.x = this.maxSpeed;
-            break;
-          case 'KeyR':
-            if (this.repeat) break;
-            this.position.x = 1;
-            this.position.y = 1;
-            this.position.z = 1;
-            this.velocity.set(0, 0, 0);
-            break;
+            case 'KeyW':
+                this.input.z = this.maxSpeed;
+                break;
+            case 'KeyA':
+                this.input.x = -this.maxSpeed;
+                break;
+            case 'KeyS':
+                this.input.z = -this.maxSpeed;
+                break;
+            case 'KeyD':
+                this.input.x = this.maxSpeed;
+                break;
+            case 'Space':
+                if (this.onGround) {
+                    this.velocity.y = this.jumpSpeed;
+                    this.onGround = false;
+                }
+                break;
+            case 'KeyR':
+                if (this.repeat) break;
+                this.position.x = 1;
+                this.position.y = 1;
+                this.position.z = 1;
+                this.velocity.set(0, 0, 0);
+                break;
         }
-      }
-    
-    /**
-     * Event handler for 'keyup' event
-     * @param {KeyboardEvent} event 
-    */
+    }
+
     onKeyUp(event) {
         switch (event.code) {
             case 'KeyW':
-            this.input.z = 0;
-            break;
-            case 'KeyA':
-            this.input.x = 0;
-            break;
             case 'KeyS':
-            this.input.z = 0;
-            break;
+                this.input.z = 0;
+                break;
+            case 'KeyA':
             case 'KeyD':
-            this.input.x = 0;
-            break;
+                this.input.x = 0;
+                break;
         }
     }
-    
-    /**
-    * Returns player position 
-    * @returns {string}
-    */
+
     toString() {
         let str = '';
         str += `X: ${this.position.x.toFixed(3)} `;
