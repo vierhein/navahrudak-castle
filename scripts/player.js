@@ -4,7 +4,7 @@ import { Capsule } from 'three/addons/math/Capsule.js';
 import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
 
 export class Player {
-    height = 1.75;
+    height = 0.3;
     radius = 0.5;
     maxSpeed = 5;
     jumpSpeed = 10;
@@ -23,7 +23,7 @@ export class Player {
     );
 
     constructor(scene) {
-        this.position.set(0, 1, 0);
+        this.position.set(0, 4, -3);
         scene.add(this.camera);
 
         document.addEventListener('keyup', this.onKeyUp.bind(this));
@@ -112,9 +112,9 @@ export class Player {
                 break;
             case 'KeyR':
                 if (this.repeat) break;
-                this.position.x = 1;
-                this.position.y = 1;
-                this.position.z = 1;
+                this.position.x = 0;
+                this.position.y = 4;
+                this.position.z = -3;
                 this.velocity.set(0, 0, 0);
                 break;
         }
