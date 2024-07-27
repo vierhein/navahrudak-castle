@@ -42,6 +42,10 @@ loader.load(
 const player = new Player(scene);
 
 // Lighting
+const fillLight1 = new THREE.HemisphereLight( 0x8dc1de, 0x00668d, 1.5 );
+fillLight1.position.set( 2, 1, 1 );
+scene.add( fillLight1 );
+
 const directionalLight = new THREE.DirectionalLight( 0xffffff, 2.5 );
 directionalLight.position.set( - 5, 25, - 1 );
 directionalLight.castShadow = true;
@@ -56,22 +60,6 @@ directionalLight.shadow.mapSize.height = 1024;
 directionalLight.shadow.radius = 4;
 directionalLight.shadow.bias = - 0.00006;
 scene.add(directionalLight);
-
-
-// const directionalLight1 = new THREE.DirectionalLight(0xffffff, 1);
-// directionalLight1.position.set(5, 10, 7.5);
-// scene.add(directionalLight1);
-
-const directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.5);
-directionalLight2.position.set(-5, -10, -7.5);
-scene.add(directionalLight2);
-
-const pointLight = new THREE.PointLight(0xffffff, 0.5);
-pointLight.position.set(0, 5, 0);
-scene.add(pointLight);
-
-const ambientLight = new THREE.AmbientLight(0x404040); // soft white light
-scene.add(ambientLight);
 
 const stats = new Stats()
 document.body.appendChild(stats.dom)
