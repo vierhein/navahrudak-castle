@@ -3,9 +3,13 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import Stats from 'three/examples/jsm/libs/stats.module';
 import { Player } from './player';
+import { Octree } from 'three/examples/jsm/Addons.js';
+import { OctreeHelper } from 'three/addons/helpers/OctreeHelper.js';
+import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 
 const scene = new THREE.Scene();
+const worldOctree = new Octree();
 
 // Camera
 const orbitCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -31,12 +35,25 @@ loader.load(
     function (gltf) {
         console.log('Model loaded:', gltf);
         scene.add(gltf.scene);
+        worldOctree.fromGraphNode( gltf.scene );
         // add mesh objects to octree
         gltf.scene.traverse(function (child) {
             if (child.isMesh) {
                 player.octree.fromGraphNode(child);
             }
         });
+
+        const helper = new OctreeHelper( worldOctree );
+        helper.visible = false;
+        scene.add( helper );
+
+        const gui = new GUI( { width: 200 } );
+        gui.add( { debug: false }, 'debug' )
+            .onChange( function ( value ) {
+
+                helper.visible = value;
+
+            } );
     },
     function (xhr) {
         console.log((xhr.loaded / xhr.total * 100) + '% loaded');
