@@ -6,8 +6,8 @@ import { PointerLockControls } from 'three/addons/controls/PointerLockControls.j
 export class Player {
     height = 0.3;
     radius = 0.5;
-    maxSpeed = 5;
-    jumpSpeed = 10;
+    maxSpeed = 3;
+    jumpSpeed = 3;
     gravity = -9.8;
     onGround = false;
     input = new THREE.Vector3();
@@ -78,8 +78,9 @@ export class Player {
             this.velocity.addScaledVector(collisionNormal, -this.velocity.dot(collisionNormal));
 
             // If the collision normal is pointing upwards, the player is on the ground
-            if (collisionNormal.y > 0.5) {
+            if (collisionNormal.y > 0.05) {
                 this.onGround = true;
+                this.velocity.y = Math.max(0, this.velocity.y);
             } else {
                 this.onGround = false;
             }
@@ -112,9 +113,7 @@ export class Player {
                 break;
             case 'KeyR':
                 if (this.repeat) break;
-                this.position.x = 0;
-                this.position.y = 4;
-                this.position.z = -3;
+                this.position.set(0, 4, -3);
                 this.velocity.set(0, 0, 0);
                 break;
         }
