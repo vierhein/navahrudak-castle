@@ -23,7 +23,7 @@ export class Player {
     );
 
     constructor(scene) {
-        this.position.set(0, 4, -3);
+        this.position.set(11, 1, 8);
         scene.add(this.camera);
 
         document.addEventListener('keyup', this.onKeyUp.bind(this));
