@@ -69,26 +69,14 @@ loader.load(
 
 const player = new Player(scene);
 
-// Lighting
-const hemi = new THREE.HemisphereLight(0xffffff, 0x444444, 1);
-hemi.position.set(0, 50, 0); // сверху
-scene.add(hemi);
-
-const directionalLight = new THREE.DirectionalLight(0xffffff, 2.5);
-directionalLight.position.set(1, 1, 1);
-// // directionalLight.castShadow = true;
-// directionalLight.shadow.camera.near = 0.01;
-// directionalLight.shadow.camera.far = 500;
-// directionalLight.shadow.camera.right = 30;
-// directionalLight.shadow.camera.left = -30;
-// directionalLight.shadow.camera.top = 30;
-// // directionalLight.shadow.camera.bottom = -30;
-// directionalLight.shadow.mapSize.width = 1024;
-// directionalLight.shadow.mapSize.height = 1024;
-// directionalLight.shadow.radius = 4;
-// directionalLight.shadow.bias = -0.00006;
+// Light
+const directionalLight = new THREE.DirectionalLight(0xffffff, 3);
+directionalLight.position.set(10, 10, 10);
 scene.add(directionalLight);
 
+const backLight = new THREE.DirectionalLight(0xffffff, 1.5);
+backLight.position.set(-10, 5, -10);
+scene.add(backLight);
 
 // Stats
 const stats = new Stats();
