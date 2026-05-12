@@ -113,7 +113,7 @@ export class Player {
                 break;
             case 'KeyR':
                 if (this.repeat) break;
-                this.position.set(0, 4, -3);
+                this.position.set(11, 1, 8);
                 this.velocity.set(0, 0, 0);
                 break;
         }
